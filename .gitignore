@@ -1,2 +1,37 @@
-./lab_guide
+# Compiled Object files
+*.o
 
+# Executables (Binaries)
+# Generic pattern for files without extensions (common in Linux)
+# Or specific names from your exercise files:
+gpu_run_silver1.sh
+cuda_kmeans_all_gpu_delta_reduction.cu
+Game_Of_Life
+kmeans_seq
+kmeans_omp_*
+kmeans_cuda_*
+kmeans_mpi
+fw
+fw_sr
+jacobi_mpi
+redblackSOR_mpi
+gaussSeidelSOR_mpi
+omp_gameoflife_1
+check_cpu.sh
+dokimi_copied.sh 
+
+# MPI/Parallel specific output/log files
+*.out
+*.err
+machinefile
+*.log
+
+# Libraries and Archives
+*.a
+*.lib
+*.so
+
+# IDE and System files
+.vscode/
+.idea/
+.DS_Store
