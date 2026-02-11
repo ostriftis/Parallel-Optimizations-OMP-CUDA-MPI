@@ -1,3 +1,0 @@
-mpicc -O3 -lm -Wall   Jacobi_mpi.c utils.c -o jacobi_mpi
-mpicc -O3 -lm -Wall   RedBlackSOR_mpi.c utils.c -o redblackSOR_mpi
-mpicc -O3 -lm -Wall   GaussSeidelSOR_mpi.c utils.c -o gaussSeidelSOR_mpi
