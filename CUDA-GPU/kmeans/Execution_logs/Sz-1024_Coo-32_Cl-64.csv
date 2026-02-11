@@ -1,0 +1,12 @@
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Sequential,-1,6.632419,6.623626,6.661897
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Sequential,-1,6.622356,6.554677,6.661734
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Sequential,-1,6.677734,6.661639,6.698579
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
+Implementation,blockSize,av_loop_t,min_loop_t,max_loop_t
