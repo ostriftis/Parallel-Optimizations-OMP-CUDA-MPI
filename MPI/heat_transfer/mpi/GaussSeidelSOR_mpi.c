@@ -120,11 +120,8 @@ int main(int argc, char ** argv) {
 
     //----Rank 0 scatters the global matrix----//
 
-	//*************DONE*******************//
-    //if(rank == 0) {printf("Starting Scattering from rank %d\n", rank); fflush(stdout);}  
     MPI_Scatterv(rank == 0? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, &(u_current[1][1]), 1, local_block, 0, MPI_COMM_WORLD);
     MPI_Scatterv(rank == 0? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, &(u_previous[1][1]), 1, local_block, 0, MPI_COMM_WORLD);
-    //if(rank == 0) {printf("Ended Scattering from rank %d\n", rank); fflush(stdout);}
 
 	/*Make sure u_current and u_previous are
 		both initialized*/
@@ -138,8 +135,6 @@ int main(int argc, char ** argv) {
  
      
 	//----Define datatypes or allocate buffers for message passing----//
-
-	//*************DONE*******************//
     
     MPI_Datatype side, updown;
 
@@ -151,30 +146,16 @@ int main(int argc, char ** argv) {
     MPI_Type_create_resized(dummy,0,sizeof(double),&updown);
     MPI_Type_commit(&updown);
 
-
-
-
-
-	//************************************//
-
-
     //----Find the 4 neighbors with which a process exchanges messages----//
 
-	//*************DONE*******************//
     int north, south, east, west;
-    //if(rank == 0) {printf("Trying to find neighbours\n"); fflush(stdout);}
     MPI_Cart_shift(CART_COMM, 0, 1, &north, &south);     
     MPI_Cart_shift(CART_COMM, 1, 1, &west, &east);    	
-    //if(rank == 0) {printf("Found neighbours\n"); fflush(stdout);}
 	/*Make sure you handle non-existing
 		neighbors appropriately*/
 
-	//************************************//
-
-
 
     //---Define the iteration ranges per process-----//
-	//*************DONE*******************//
 
     int i_min,i_max,j_min,j_max;
 
@@ -195,9 +176,6 @@ int main(int argc, char ** argv) {
 
 
 
-	//************************************//
-
-
 
 
  	//----Computational core----//   
@@ -211,12 +189,8 @@ int main(int argc, char ** argv) {
     #define T 256
     for (t=0;t<T;t++) {
     #endif
-	//printf("Started iteration %d, from rank %d\n", t, rank);
-	//fflush(stdout);
 
-	 	//*************DONE******************//
      
-
 		swap = u_previous;
 		u_previous = u_current;
 		u_current = swap;
@@ -264,7 +238,6 @@ int main(int argc, char ** argv) {
 		
 		#ifdef TEST_CONV
         	if (t%C==0) {
-			//*************TODO**************//
 			/*Test convergence*/
 		gettimeofday(&tconvs, NULL);
 		converged = converge(u_previous, u_current, i_min, i_max, j_min, j_max);
@@ -279,8 +252,6 @@ int main(int argc, char ** argv) {
 }		
 		#endif
 
-
-		//************************************//
         
     }
     gettimeofday(&ttf,NULL);
@@ -301,25 +272,10 @@ int main(int argc, char ** argv) {
     }
 
 
-	//*************DONE*******************//
-
-
-
-	/*Fill your code here*/
-     // if(rank==0) {printf("trying to gather everything\n"); fflush(stdout);}
        MPI_Gatherv(&(u_current[1][1]), 1, local_block,rank == 0 ? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, 0, MPI_COMM_WORLD);
-     // if(rank==0) {printf("Gathered everything\n"); fflush(stdout);}
-
-
-     //************************************//
-
-
-	
-   
+	   
 
 	//----Printing results----//
-
-	//**************TODO: Change "Jacobi" to "GaussSeidelSOR" or "RedBlackSOR" for appropriate printing****************//
     if (rank==0) {
         printf("GaussSeidelSOR X %d Y %d Px %d Py %d Iter %d ComputationTime %lf ConvTime %lf CommTime %lf TotalTime %lf midpoint %lf\n",global[0],global[1],grid[0],grid[1],t,comp_time,conv_time,comm_time,total_time,U[global[0]/2][global[1]/2]);
 	

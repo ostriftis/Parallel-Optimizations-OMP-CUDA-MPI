@@ -35,3 +35,5 @@ machinefile
 .vscode/
 .idea/
 .DS_Store
+
+parlab-report.*

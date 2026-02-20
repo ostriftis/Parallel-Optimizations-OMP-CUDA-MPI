@@ -40,7 +40,7 @@ double euclid_dist_2(int numCoords,
     double diff = objects[objectId*numCoords + i] - clusters[clusterId*numCoords + i];
     ans += diff;
   }
-  /* DONE: Calculate the euclid_dist of elem=objectId of objects from elem=clusterId from clusters*/
+  /* Calculate the euclid_dist of elem=objectId of objects from elem=clusterId from clusters*/
 
   return (ans);
 }
@@ -57,18 +57,15 @@ void find_nearest_cluster(int numCoords,
   /* Get the global ID of the thread. */
   int tid = get_tid();
 
-  /* DONE: Maybe something is missing here... should all threads run this? */
   if (tid < numObjs) {
     int index, i;
     double dist, min_dist;
 
     /* find the cluster id that has min distance to object */
     index = 0;
-    /* DONE: call min_dist = euclid_dist_2(...) with correct objectId/clusterId */
     min_dist = euclid_dist_2(numCoords, numObjs, numClusters, objects, deviceClusters, tid, 0);
 
     for (i = 1; i < numClusters; i++) {
-      /* DONE: call dist = euclid_dist_2(...) with correct objectId/clusterId */
       dist = euclid_dist_2(numCoords, numObjs, numClusters, objects, deviceClusters, tid, i);
       /* no need square root */
       if (dist < min_dist) { /* find the min and its array index */
@@ -78,8 +75,6 @@ void find_nearest_cluster(int numCoords,
     }
 
     if (deviceMembership[tid] != index) {
-      /* DONE: Maybe something is missing here... is this write safe? */
-      //(*devdelta) += 1.0;
       atomicAdd(devdelta, 1.0);
     }
 
@@ -163,7 +158,7 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
     /* GPU part: calculate new memberships */
 
     timing_transfers = wtime();
-    /* DONE: Copy clusters to deviceClusters */
+    /* Copy clusters to deviceClusters */
     checkCuda(cudaMemcpy(deviceClusters, clusters, numClusters * numCoords * sizeof(double), cudaMemcpyHostToDevice)); 
     transfers_time += wtime() - timing_transfers;
 
@@ -182,11 +177,11 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
     //printf("Kernels complete for itter %d, updating data in CPU\n", loop);
 
     timing_transfers = wtime();
-    /* DONE: Copy deviceMembership to membership*/
+    /* Copy deviceMembership to membership*/
     checkCuda(cudaMemcpy(membership, deviceMembership,  
                        numObjs * sizeof(int), cudaMemcpyDeviceToHost)); 
 
-    /* DONE: Copy dev_delta_ptr to &delta */
+    /* Copy dev_delta_ptr to &delta */
     checkCuda(cudaMemcpy(&delta, dev_delta_ptr, sizeof(double), cudaMemcpyDeviceToHost)); 
     transfers_time += wtime() - timing_transfers;
 

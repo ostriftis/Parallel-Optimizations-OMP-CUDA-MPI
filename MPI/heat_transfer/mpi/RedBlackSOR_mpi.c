@@ -130,12 +130,9 @@ int main(int argc, char ** argv) {
 
     //----Rank 0 scatters the global matrix----//
 
-	//*************DONE*******************//
-    //if(rank == 0) {printf("Starting Scattering from rank %d\n", rank); fflush(stdout);}  
-    MPI_Scatterv(rank == 0? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, &(u_current[1][1]), 1, local_block, 0, MPI_COMM_WORLD);
+	MPI_Scatterv(rank == 0? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, &(u_current[1][1]), 1, local_block, 0, MPI_COMM_WORLD);
     MPI_Scatterv(rank == 0? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, &(u_previous[1][1]), 1, local_block, 0, MPI_COMM_WORLD);
-    //if(rank == 0) {printf("Ended Scattering from rank %d\n", rank); fflush(stdout);}
-
+    
 	/*Make sure u_current and u_previous are
 		both initialized*/
 
@@ -149,8 +146,7 @@ int main(int argc, char ** argv) {
      
 	//----Define datatypes or allocate buffers for message passing----//
 
-	//*************DONE*******************//
-    
+	
     MPI_Datatype side, updown;
 
     MPI_Type_vector(local[0], 1, local[1] + 2, MPI_DOUBLE, &dummy);
@@ -170,13 +166,10 @@ int main(int argc, char ** argv) {
 
     //----Find the 4 neighbors with which a process exchanges messages----//
 
-	//*************DONE*******************//
-    int north, south, east, west;
-    //if(rank == 0) {printf("Trying to find neighbours\n"); fflush(stdout);}
+	int north, south, east, west;
     MPI_Cart_shift(CART_COMM, 0, 1, &north, &south);     
     MPI_Cart_shift(CART_COMM, 1, 1, &west, &east);    	
-    //if(rank == 0) {printf("Found neighbours\n"); fflush(stdout);}
-	/*Make sure you handle non-existing
+    /*Make sure you handle non-existing
 		neighbors appropriately*/
 
 	//************************************//
@@ -184,8 +177,7 @@ int main(int argc, char ** argv) {
 
 
     //---Define the iteration ranges per process-----//
-	//*************DONE*******************//
-
+	
     int i_min,i_max,j_min,j_max;
 
 
@@ -231,28 +223,20 @@ int main(int argc, char ** argv) {
 		gettimeofday(&tcms, NULL);
 		/*Compute and Communicate*/
 		if (north != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from north, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][1]), 1, updown, north, 22,
 				     &(u_current[0][1]), 1, updown, north, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from north successful, from rank %d\n", rank);
 		}
 		if (south != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from south, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[local[0]][1]), 1, updown, south, 22,
 				     &(u_current[local[0]+1][1]), 1, updown, south, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from south successful, from rank %d\n", rank);
 		}
 		if (east != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from east, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][local[1]]), 1, side, east, 22,
 				     &(u_current[1][local[1]+1]), 1, side, east, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from east successful, from rank %d\n", rank);
 		}
 		if (west != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from west, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][1]), 1, side, west, 22,
 				     &(u_current[1][0]), 1, side, west, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from west successful, from rank %d\n", rank);
 		}
 		/*Add appropriate timers for computation*/
 		gettimeofday(&tcmf, NULL);
@@ -274,28 +258,20 @@ int main(int argc, char ** argv) {
 		
 		gettimeofday(&tcms, NULL);
 		if (north != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from north, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][1]), 1, updown, north, 22,
 				     &(u_current[0][1]), 1, updown, north, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from north successful, from rank %d\n", rank);
 		}
 		if (south != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from south, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[local[0]][1]), 1, updown, south, 22,
 				     &(u_current[local[0]+1][1]), 1, updown, south, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from south successful, from rank %d\n", rank);
 		}
 		if (east != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from east, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][local[1]]), 1, side, east, 22,
 				     &(u_current[1][local[1]+1]), 1, side, east, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from east successful, from rank %d\n", rank);
 		}
 		if (west != MPI_PROC_NULL) {
-		//	printf("Trying to send and recv from west, from rank %d\n", rank);
 			MPI_Sendrecv(&(u_current[1][1]), 1, side, west, 22,
 				     &(u_current[1][0]), 1, side, west, 22, MPI_COMM_WORLD, &stat);
-		//	printf("Send and recv from west successful, from rank %d\n", rank);
 		}
 		
 		gettimeofday(&tcmf, NULL);
@@ -309,7 +285,6 @@ int main(int argc, char ** argv) {
 		
 		#ifdef TEST_CONV
         if (t%C==0) {
-			//*************TODO**************//
 			/*Test convergence*/
  	        gettimeofday(&tconvs, NULL);	
 		converged = converge(u_previous, u_current, i_min, i_max, j_min, j_max);
@@ -325,9 +300,6 @@ int main(int argc, char ** argv) {
 }		
 		#endif
 
-
-		//************************************//
-        
     }
     gettimeofday(&ttf,NULL);
 
@@ -345,28 +317,11 @@ int main(int argc, char ** argv) {
     if (rank==0) {
             U=allocate2d(global_padded[0],global_padded[1]);
     }
-
-
-	//*************DONE*******************//
-
-
-
-	/*Fill your code here*/
-     // if(rank==0) {printf("trying to gather everything\n"); fflush(stdout);}
-       MPI_Gatherv(&(u_current[1][1]), 1, local_block,rank == 0 ? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, 0, MPI_COMM_WORLD);
-     // if(rank==0) {printf("Gathered everything\n"); fflush(stdout);}
-
-
-     //************************************//
-
-
-	
-   
-
+	   MPI_Gatherv(&(u_current[1][1]), 1, local_block,rank == 0 ? &U[0][0]: NULL, scattercounts, scatteroffset, global_block, 0, MPI_COMM_WORLD);
+    
 	//----Printing results----//
 
-	//**************TODO: Change "Jacobi" to "GaussSeidelSOR" or "RedBlackSOR" for appropriate printing****************//
-    if (rank==0) {
+	if (rank==0) {
         printf("RedBlackSOR X %d Y %d Px %d Py %d Iter %d ComputationTime %lf ConvTime %lf CommTime %lf TotalTime %lf midpoint %lf\n",global[0],global[1],grid[0],grid[1],t,comp_time, conv_time,comm_time,total_time,U[global[0]/2][global[1]/2]);
 	
         #ifdef PRINT_RESULTS

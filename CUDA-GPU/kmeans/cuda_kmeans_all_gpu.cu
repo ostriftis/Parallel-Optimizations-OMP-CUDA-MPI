@@ -21,7 +21,7 @@ inline void checkLastCudaError() {
 #endif
 
 __device__ int get_tid() {
-  return 0; /* TODO: copy me from naive version... */
+  return 0; 
 }
 
 /* square of Euclid distance between two multi-dimensional points using column-base format */
@@ -36,7 +36,7 @@ double euclid_dist_2_transpose(int numCoords,
   int i;
   double ans = 0.0;
 
-  /* DONE: Calculate the euclid_dist of elem=objectId of objects from elem=clusterId from clusters, but for column-base format!!! */
+  /* Calculate the euclid_dist of elem=objectId of objects from elem=clusterId from clusters, but for column-base format!!! */
   for (i=0; i < numCoords; i++) {
     double diff = objects[i*numObjs + objectId] - clusters[i*numClusters + clusterId];
     ans += diff * diff;
@@ -50,9 +50,6 @@ void find_nearest_cluster(int numCoords,
                           int numObjs,
                           int numClusters,
                           double *deviceobjects,           //  [numCoords][numObjs]
-/*                          
-                          DONE: If you choose to do (some of) the new centroid calculation here, you will need some extra parameters here (from "update_centroids").
-*/
                           int *devicenewClusterSize,        //  [numClusters]
                           double *devicenewClusters,        //  [numCoords][numClusters]
                           double *deviceClusters,    //  [numCoords][numClusters]
@@ -60,7 +57,6 @@ void find_nearest_cluster(int numCoords,
                           double *devdelta) {
   extern __shared__ double shmemClusters[];
 
-  /* DONE: copy me from shared version... */
   // We assign each thread to copy the tid-th, tid+BlockDim-th elements
   for (int i = threadIdx.x;  i < numCoords*numClusters; i += blockDim.x) {
     shmemClusters[i] = deviceClusters[i];
@@ -70,7 +66,6 @@ void find_nearest_cluster(int numCoords,
   /* Get the global ID of the thread. */
   int tid = get_tid();
 
-  /* DONE: copy me from shared version... */
   if (tid < numObjs) {
     int index, i;
     double dist, min_dist;
@@ -101,7 +96,7 @@ void find_nearest_cluster(int numCoords,
     deviceMembership[tid] = index;
 
 
-    /* DONE: additional steps for calculating new centroids in GPU? */
+    /* additional steps for calculating new centroids in GPU? */
     atomicAdd(&devicenewClusterSize[index], 1);
     for (int c = 0; c < numCoords; c++) {
       atomicAdd(&devicenewClusters[c * numClusters + index],
@@ -119,7 +114,7 @@ void update_centroids(int numCoords,
                       double *deviceClusters)    //  [numCoords][numClusters])
 {
 
-  /* DONE: additional steps for calculating new centroids in GPU? */
+  /* additional steps for calculating new centroids in GPU? */
   int tid = get_tid();
   int total = numCoords * numClusters;
 
@@ -171,14 +166,12 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
   int loop_iterations = 0;
   int i, j, index, loop = 0;
   double delta = 0, *dev_delta_ptr;          /* % of objects change their clusters */
-  /* DONE: Copy me from transpose version*/
   double **dimObjects = (double **) calloc_2d(numCoords, numObjs, sizeof(double)); // -> [numCoords][numObjs]
   double **dimClusters = (double **) calloc_2d(numCoords, numClusters, sizeof(double));   //calloc_2d(...) -> [numCoords][numClusters]
   double **newClusters = (double **) calloc_2d(numCoords, numClusters, sizeof(double));  //calloc_2d(...) -> [numCoords][numClusters]
 
   printf("\n|-----------Full-offload GPU Kmeans------------|\n\n");
 
-  /* DONE: Copy me from transpose version*/
   for (i = 0; i < numObjs; i++) {
     for (j = 0; j < numCoords; j++) {
       dimObjects[j][i] = objects[i * numCoords + j];
@@ -204,7 +197,7 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
   printf("t_alloc: %lf ms\n\n", 1000 * timing);
   timing = wtime();
   const unsigned int numThreadsPerClusterBlock = (numObjs > blockSize) ? blockSize : numObjs;
-  const unsigned int numClusterBlocks = (numObjs + numThreadsPerClusterBlock - 1) / numThreadsPerClusterBlock; /* DONE: Calculate Grid size, e.g. number of blocks. */
+  const unsigned int numClusterBlocks = (numObjs + numThreadsPerClusterBlock - 1) / numThreadsPerClusterBlock; /* Calculate Grid size, e.g. number of blocks. */
   /*	Define the shared memory needed per block.
       - BEWARE: We can overrun our shared memory here if there are too many
       clusters or too many coordinates!
@@ -250,7 +243,7 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
     checkCuda(cudaMemset(dev_delta_ptr, 0, sizeof(double)));
     timing_gpu = wtime();
     //printf("Launching find_nearest_cluster Kernel with grid_size = %d, block_size = %d, shared_mem = %d KB\n", numClusterBlocks, numThreadsPerClusterBlock, clusterBlockSharedDataSize/1000);
-    /* DONE: change invocation if extra parameters needed
+    /* change invocation if extra parameters needed
     find_nearest_cluster
         <<< numClusterBlocks, numThreadsPerClusterBlock, clusterBlockSharedDataSize >>>
         (numCoords, numObjs, numClusters,
@@ -269,17 +262,17 @@ void kmeans_gpu(double *objects,      /* in: [numObjs][numCoords] */
     //printf("Kernels complete for itter %d, updating data in CPU\n", loop);
 
     timing_transfers = wtime();
-    /* DONE: Copy dev_delta_ptr to &delta
+    /* Copy dev_delta_ptr to &delta
       checkCuda(cudaMemcpy(...)); */
     checkCuda(cudaMemcpy(&delta, dev_delta_ptr, sizeof(double), cudaMemcpyDeviceToHost));
     
     transfers_time += wtime() - timing_transfers;
 
     const unsigned int update_centroids_block_sz = (numCoords * numClusters > blockSize) ? blockSize : numCoords *
-                                                                                                       numClusters;  /* DONE: can use different blocksize here if deemed better */
-    const unsigned int update_centroids_dim_sz = (numCoords * numClusters + update_centroids_block_sz - 1) / update_centroids_block_sz; /* DONE: calculate dim for "update_centroids" */
+                                                                                                       numClusters;  /* can use different blocksize here if deemed better */
+    const unsigned int update_centroids_dim_sz = (numCoords * numClusters + update_centroids_block_sz - 1) / update_centroids_block_sz; /* calculate dim for "update_centroids" */
     timing_gpu = wtime();
-    /* DONE: use dim for "update_centroids" and fire it
+    /* use dim for "update_centroids" and fire it
      	update_centroids<<< update_centroids_dim_sz, update_centroids_block_sz, 0 >>>
             (numCoords, numClusters, devicenewClusterSize, devicenewClusters, deviceClusters);  */
     update_centroids<<< update_centroids_dim_sz, update_centroids_block_sz, 0 >>>

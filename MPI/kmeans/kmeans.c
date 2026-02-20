@@ -104,7 +104,7 @@ void kmeans(double * objects,         /* in: [numObjs][numCoords] */
         }
 
         /*
-         * DONE: Perform reduction of cluster data (rank_newClusters, rank_newClusterSize) from local arrays to shared.
+         * Perform reduction of cluster data (rank_newClusters, rank_newClusterSize) from local arrays to shared.
          */
 
 
@@ -121,7 +121,7 @@ void kmeans(double * objects,         /* in: [numObjs][numCoords] */
         }
         
         /*
-         * TODO: Perform reduction from rank_delta variable to delta variable, that will be used for convergence check.
+         * Perform reduction from rank_delta variable to delta variable, that will be used for convergence check.
          */
 	
 	MPI_Allreduce(&rank_delta, &delta, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);        
@@ -131,8 +131,7 @@ void kmeans(double * objects,         /* in: [numObjs][numCoords] */
         
 
         loop++;
-        //printf("\r\tcompleted loop %d", loop);
-        //fflush(stdout);
+        
     } while (delta > threshold && loop < loop_threshold);
     
     timing = wtime() - timing;
